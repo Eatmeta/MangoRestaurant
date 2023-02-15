@@ -8,20 +8,20 @@ namespace Mango.Web.Services;
 
 public class BaseService : IBaseService
 {
-    public ResponseDto responseModel { get; set; }
-    public IHttpClientFactory httpClient { get; set; }
+    public ResponseDto ResponseModel { get; set; }
+    public IHttpClientFactory HttpClient { get;}
 
     public BaseService(IHttpClientFactory httpClient)
     {
-        responseModel = new ResponseDto();
-        this.httpClient = httpClient;
+        ResponseModel = new ResponseDto();
+        HttpClient = httpClient;
     }
 
     public async Task<T> SendAsync<T>(ApiRequest apiRequest)
     {
         try
         {
-            var client = httpClient.CreateClient("MangoAPI");
+            var client = HttpClient.CreateClient("MangoAPI");
             var message = new HttpRequestMessage();
             
             message.Headers.Add("Accept", "application/json");
@@ -41,12 +41,11 @@ public class BaseService : IBaseService
             }
 
             HttpResponseMessage apiResponse = null;
-            
             message.Method = apiRequest.ApiType switch
             {
-                SD.ApiType.POST => HttpMethod.Post,
-                SD.ApiType.PUT => HttpMethod.Put,
-                SD.ApiType.DELETE => HttpMethod.Delete,
+                Sd.ApiType.Post => HttpMethod.Post,
+                Sd.ApiType.Put => HttpMethod.Put,
+                Sd.ApiType.Delete => HttpMethod.Delete,
                 _ => HttpMethod.Get
             };
             apiResponse = await client.SendAsync(message);

@@ -66,6 +66,23 @@ public class ProductAPIController : ControllerBase
         return _response;
     }
     
+    [HttpPut]
+    //[Authorize]
+    public async Task<object> Put([FromBody] ProductDto productDto)
+    {
+        try
+        {
+            var model = await _productRepository.CreateUpdateProduct(productDto);
+            _response.Result = model;
+        }
+        catch (Exception ex)
+        {
+            _response.IsSuccess = false;
+            _response.ErrorMessages = new List<string> { ex.ToString() };
+        }
+        return _response;
+    }
+    
     [HttpDelete]
     //[Authorize(Roles ="Admin")]
     [Route("{id:int}")]

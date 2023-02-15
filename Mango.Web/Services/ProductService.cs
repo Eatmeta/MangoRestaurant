@@ -1,25 +1,22 @@
 ﻿using Mango.Web.Models;
 using Mango.Web.Services.IServices;
-using static Mango.Web.SD;
+using static Mango.Web.Sd;
 
 namespace Mango.Web.Services;
 
 public class ProductService : BaseService, IProductService
 {
-    private readonly IHttpClientFactory _clientFactory;
-
     public ProductService(IHttpClientFactory clientFactory) : base(clientFactory)
     {
-        _clientFactory = clientFactory;
     }
-
+    
     public async Task<T> CreateProductAsync<T>(ProductDto productDto)
     {
         return await SendAsync<T>(new ApiRequest
         {
-            ApiType = ApiType.POST,
+            ApiType = ApiType.Post,
             Data = productDto,
-            Url = ProductAPIBase + "/api/products",
+            Url = ProductApiBase + "/api/products",
             AccessToken = ""
         });
     }
@@ -28,8 +25,8 @@ public class ProductService : BaseService, IProductService
     {
         return await SendAsync<T>(new ApiRequest
         {
-            ApiType = ApiType.DELETE,
-            Url = ProductAPIBase + "/api/products/" + id,
+            ApiType = ApiType.Delete,
+            Url = ProductApiBase + "/api/products/" + id,
             AccessToken = ""
         });
     }
@@ -38,8 +35,8 @@ public class ProductService : BaseService, IProductService
     {
         return await SendAsync<T>(new ApiRequest
         {
-            ApiType = ApiType.GET,
-            Url = ProductAPIBase + "/api/products",
+            ApiType = ApiType.Get,
+            Url = ProductApiBase + "/api/products",
             AccessToken = ""
         });
     }
@@ -48,8 +45,9 @@ public class ProductService : BaseService, IProductService
     {
         return await SendAsync<T>(new ApiRequest
         {
-            ApiType = ApiType.GET,
-            Url = ProductAPIBase + "/api/products/" + id,
+            ApiType = ApiType.Get,
+            Url = ProductApiBase + "/api/products/" + id,
+            AccessToken = ""
         });
     }
 
@@ -57,9 +55,9 @@ public class ProductService : BaseService, IProductService
     {
         return await SendAsync<T>(new ApiRequest
         {
-            ApiType = ApiType.PUT,
+            ApiType = ApiType.Put,
             Data = productDto,
-            Url = ProductAPIBase + "/api/products",
+            Url = ProductApiBase + "/api/products",
             AccessToken = ""
         });
     }
