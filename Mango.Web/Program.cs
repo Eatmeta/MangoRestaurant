@@ -10,6 +10,26 @@ builder.Services.AddScoped<IProductService, ProductService>();
 
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultScheme = "Cookies";
+        options.DefaultChallengeScheme = "oidc";
+    })
+    .AddCookie("Cookies", cookieOptions 
+        => cookieOptions.ExpireTimeSpan = TimeSpan.FromMinutes(10))
+    .AddOpenIdConnect("oidc", authenticationOptions =>
+    {
+        authenticationOptions.Authority = builder.Configuration["ServiceUrls:IdentityAPI"];
+        authenticationOptions.GetClaimsFromUserInfoEndpoint = true;
+        authenticationOptions.ClientId = "mango";
+        authenticationOptions.ClientSecret = "secret";
+        authenticationOptions.ResponseType = "code";
+        authenticationOptions.TokenValidationParameters.NameClaimType = "name";
+        authenticationOptions.TokenValidationParameters.RoleClaimType = "role";
+        authenticationOptions.Scope.Add("mango");
+        authenticationOptions.SaveTokens = true;
+    });
+
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
@@ -20,9 +40,12 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

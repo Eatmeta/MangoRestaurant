@@ -14,10 +14,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Controllers" />
-    </ItemGroup>
-
-    <ItemGroup>
       <PackageReference Include="Duende.IdentityServer.AspNetIdentity" Version="6.2.3" />
       <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="6.0.14" />
       <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.14" />
