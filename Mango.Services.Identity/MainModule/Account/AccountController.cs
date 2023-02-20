@@ -131,12 +131,12 @@ namespace IdentityServerHost.Quickstart.UI
                     {
                         return Redirect(model.ReturnUrl);
                     }
-                    
+
                     if (string.IsNullOrEmpty(model.ReturnUrl))
                     {
                         return Redirect("~/");
                     }
-                    
+
                     throw new Exception("invalid return url");
                 }
 
@@ -226,6 +226,13 @@ namespace IdentityServerHost.Quickstart.UI
         public async Task<IActionResult> Register(RegisterViewModel model, string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
+            var roles = new List<string>
+            {
+                "Admin",
+                "Customer"
+            };
+            ViewBag.message = roles;
+            
             if (ModelState.IsValid)
             {
                 var user = new ApplicationUser
@@ -289,15 +296,14 @@ namespace IdentityServerHost.Quickstart.UI
                         {
                             return Redirect(model.ReturnUrl);
                         }
-                        else if (string.IsNullOrEmpty(model.ReturnUrl))
+
+                        if (string.IsNullOrEmpty(model.ReturnUrl))
                         {
                             return Redirect("~/");
                         }
-                        else
-                        {
-                            // user might have clicked on a malicious link - should be logged
-                            throw new Exception("invalid return URL");
-                        }
+
+                        // user might have clicked on a malicious link - should be logged
+                        throw new Exception("invalid return URL");
                     }
                 }
             }
