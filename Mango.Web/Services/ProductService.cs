@@ -1,6 +1,5 @@
 ﻿using Mango.Web.Models;
 using Mango.Web.Services.IServices;
-using static Mango.Web.Sd;
 
 namespace Mango.Web.Services;
 
@@ -14,9 +13,9 @@ public class ProductService : BaseService, IProductService
     {
         return await SendAsync<T>(new ApiRequest
         {
-            ApiType = ApiType.Post,
+            ApiType = Sd.ApiType.Post,
             Data = productDto,
-            Url = ProductApiBase + "/api/products",
+            Url = Sd.ProductApiBase + "/api/products",
             AccessToken = token
         });
     }
@@ -25,8 +24,8 @@ public class ProductService : BaseService, IProductService
     {
         return await SendAsync<T>(new ApiRequest
         {
-            ApiType = ApiType.Delete,
-            Url = ProductApiBase + "/api/products/" + id,
+            ApiType = Sd.ApiType.Delete,
+            Url = Sd.ProductApiBase + "/api/products/" + id,
             AccessToken = token
         });
     }
@@ -35,8 +34,8 @@ public class ProductService : BaseService, IProductService
     {
         return await SendAsync<T>(new ApiRequest
         {
-            ApiType = ApiType.Get,
-            Url = ProductApiBase + "/api/products",
+            ApiType = Sd.ApiType.Get,
+            Url = Sd.ProductApiBase + "/api/products",
             AccessToken = token
         });
     }
@@ -45,8 +44,8 @@ public class ProductService : BaseService, IProductService
     {
         return await SendAsync<T>(new ApiRequest
         {
-            ApiType = ApiType.Get,
-            Url = ProductApiBase + "/api/products/" + id,
+            ApiType = Sd.ApiType.Get,
+            Url = Sd.ProductApiBase + "/api/products/" + id,
             AccessToken = token
         });
     }
@@ -55,9 +54,9 @@ public class ProductService : BaseService, IProductService
     {
         return await SendAsync<T>(new ApiRequest
         {
-            ApiType = ApiType.Put,
+            ApiType = Sd.ApiType.Put,
             Data = productDto,
-            Url = ProductApiBase + "/api/products",
+            Url = Sd.ProductApiBase + "/api/products",
             AccessToken = token
         });
     }
