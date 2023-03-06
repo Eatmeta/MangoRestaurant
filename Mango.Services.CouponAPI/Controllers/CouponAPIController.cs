@@ -11,10 +11,10 @@ public class CouponAPIController : Controller
     private readonly ICouponRepository _couponRepository;
     protected ResponseDto _response;
 
-    public CouponAPIController(ICouponRepository couponRepository, ResponseDto response)
+    public CouponAPIController(ICouponRepository couponRepository)
     {
         _couponRepository = couponRepository;
-        _response = response;
+        _response = new ResponseDto();
     }
     
     [HttpGet("{code}")]

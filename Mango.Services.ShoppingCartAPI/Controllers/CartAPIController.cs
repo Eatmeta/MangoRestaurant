@@ -80,13 +80,45 @@ public class CartAPIController : Controller
         }
         return _response;
     }
-    
+
     [HttpPost("ClearCart")]
     public async Task<object> ClearCart([FromBody] string userId)
     {
         try
         {
             var isSuccess = await _cartRepository.ClearCart(userId);
+            _response.Result = isSuccess;
+        }
+        catch (Exception ex)
+        {
+            _response.IsSuccess = false;
+            _response.ErrorMessages = new List<string> {ex.ToString()};
+        }
+        return _response;
+    }
+
+    [HttpPost("ApplyCoupon")]
+    public async Task<object> ApplyCoupon([FromBody] CartDto cartDto)
+    {
+        try
+        {
+            var isSuccess = await _cartRepository.ApplyCoupon(cartDto.CartHeader.UserId, cartDto.CartHeader.CouponCode);
+            _response.Result = isSuccess;
+        }
+        catch (Exception ex)
+        {
+            _response.IsSuccess = false;
+            _response.ErrorMessages = new List<string> {ex.ToString()};
+        }
+        return _response;
+    }
+
+    [HttpPost("RemoveCoupon")]
+    public async Task<object> RemoveCoupon([FromBody] string userId)
+    {
+        try
+        {
+            var isSuccess = await _cartRepository.RemoveCoupon(userId);
             _response.Result = isSuccess;
         }
         catch (Exception ex)
