@@ -1,8 +1,14 @@
 ﻿@model Mango.Web.Models.CartDto
 
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-warning" role="alert">@TempData["Error"]</div>
+}
+
 @if (Model != null && Model.CartDetails.Any())
 {
     <form method="post">
+
         <input asp-for="CartHeader.UserId" hidden/>
         <input asp-for="CartHeader.CartHeaderId" hidden/>
         <input asp-for="CartHeader.CouponCode" hidden/>
@@ -18,7 +24,7 @@
                     <div class="row">
                         <div class="col-12">
                             <label class="col-form-label">First Name :</label>
-                            <input asp-for="CartHeader.FirstName" value="@Model.CartHeader.FirstName" class="form-control"/>
+                            <input asp-for="CartHeader.FirstName" class="form-control"/>
                         </div>
                         <div class="col-12">
                             <label class="col-form-label">Last Name :</label>
@@ -40,14 +46,17 @@
                             <label class="col-form-label">Card Number :</label>
                             <input asp-for="CartHeader.CardNumber" class="form-control"/>
                         </div>
+
                         <div class="col-12">
-                            <label class="col-form-label">Expiry date :</label>
+                            <label class="col-form-label">Expiry :</label>
                             <input asp-for="CartHeader.ExpiryMonthYear" placeholder="MM/YY" class="form-control"/>
                         </div>
-                        <div class="col-12  pb-4">
+
+                        <div class="col-12 pb-4">
                             <label class="col-form-label">CVV :</label>
                             <input asp-for="CartHeader.CVV" class="form-control"/>
                         </div>
+
                     </div>
                 </div>
                 <div class="col-5">
@@ -89,11 +98,11 @@
                             }
                             <div class="row">
                                 <div class="col-12 text-right pr-4 text-danger">
+                                    Order Total : @($"{Model.CartHeader.OrderTotal:c}") <br/>
                                     @if (Model.CartHeader.DiscountTotal > 0)
                                     {
-                                        <span class="text-success"> Discount : @($"{Model.CartHeader.DiscountTotal:c}")<br/></span>
+                                        <span class="text-success"> Order Discount : @($"{Model.CartHeader.DiscountTotal:c}")</span>
                                     }
-                                    Order Total : @($"{Model.CartHeader.OrderTotal:c}")
                                 </div>
                             </div>
 
