@@ -18,6 +18,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integration", "Integration"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mango.MessageBus", "Mango.MessageBus\Mango.MessageBus.csproj", "{0576F405-DF62-4F49-A02B-2D6702DD9328}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mango.Services.OrderAPI", "Mango.Services.OrderAPI\Mango.Services.OrderAPI.csproj", "{9F761277-9A1C-4E2E-B8ED-4993E29D6970}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,6 +32,7 @@ Global
 		{D9DBD7EA-1C95-40A6-9F06-F33EA46B0451} = {9474DC76-F6E8-4A1F-B1C9-32BD6CEEA0BE}
 		{A2F988E5-DFAA-4817-925A-1A947A7410AA} = {9474DC76-F6E8-4A1F-B1C9-32BD6CEEA0BE}
 		{0576F405-DF62-4F49-A02B-2D6702DD9328} = {F610840D-2DC3-4AFE-A9CC-3D17C63FC0D5}
+		{9F761277-9A1C-4E2E-B8ED-4993E29D6970} = {9474DC76-F6E8-4A1F-B1C9-32BD6CEEA0BE}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{62DDFBF4-3647-4A11-A4AE-AC8210E73F48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -56,5 +59,9 @@ Global
 		{0576F405-DF62-4F49-A02B-2D6702DD9328}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0576F405-DF62-4F49-A02B-2D6702DD9328}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0576F405-DF62-4F49-A02B-2D6702DD9328}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F761277-9A1C-4E2E-B8ED-4993E29D6970}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F761277-9A1C-4E2E-B8ED-4993E29D6970}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F761277-9A1C-4E2E-B8ED-4993E29D6970}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F761277-9A1C-4E2E-B8ED-4993E29D6970}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
