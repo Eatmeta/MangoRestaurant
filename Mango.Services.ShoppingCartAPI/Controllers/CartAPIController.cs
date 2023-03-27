@@ -1,6 +1,6 @@
 ﻿using Mango.Services.ShoppingCartAPI.Messages;
 using Mango.Services.ShoppingCartAPI.Models.Dto;
-using Mango.Services.ShoppingCartAPI.RabbitMQSender;
+using Mango.Services.ShoppingCartAPI.RabbitMqSender;
 using Mango.Services.ShoppingCartAPI.Repository;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,14 +13,17 @@ public class CartAPIController : Controller
     private readonly ICartRepository _cartRepository;
     protected ResponseDto _response;
     private readonly ICouponRepository _couponRepository;
-    private readonly IRabbitMQCartMessageSender _rabbitMQCartMessageSender;
+    private readonly IRabbitMqCartMessageSender _rabbitMQCartMessageSender;
+    private readonly IConfiguration _configuration;
 
-    public CartAPIController(ICartRepository cartRepository, ICouponRepository couponRepository, IRabbitMQCartMessageSender rabbitMQCartMessageSender)
+    public CartAPIController(ICartRepository cartRepository, ICouponRepository couponRepository,
+        IRabbitMqCartMessageSender rabbitMQCartMessageSender, IConfiguration Configuration)
     {
         _cartRepository = cartRepository;
         _response = new ResponseDto();
         _couponRepository = couponRepository;
         _rabbitMQCartMessageSender = rabbitMQCartMessageSender;
+        _configuration = Configuration;
     }
 
     [HttpGet("GetCart/{userId}")]
@@ -141,24 +144,24 @@ public class CartAPIController : Controller
         try
         {
             var cartDto = await _cartRepository.GetCartByUserId(checkoutHeader.UserId);
-            
+
             if (cartDto == null) return BadRequest();
-            
+
             if (!string.IsNullOrEmpty(checkoutHeader.CouponCode))
             {
                 var coupon = await _couponRepository.GetCoupon(checkoutHeader.CouponCode);
                 if (Math.Abs(checkoutHeader.DiscountTotal - coupon.DiscountAmount) > 1e-5)
                 {
                     _response.IsSuccess = false;
-                    _response.ErrorMessages = new List<string>() { "Coupon Price has changed, please confirm" };
+                    _response.ErrorMessages = new List<string> {"Coupon Price has changed, please confirm"};
                     _response.DisplayMessage = "Coupon Price has changed, please confirm";
                     return _response;
                 }
             }
-            
+
             checkoutHeader.CartDetails = cartDto.CartDetails;
-            
-            _rabbitMQCartMessageSender.SendMessage(checkoutHeader, "checkoutqueue");
+
+            _rabbitMQCartMessageSender.SendMessage(checkoutHeader, _configuration["RabbitMqSettings:QueueName"]);
             await _cartRepository.ClearCart(checkoutHeader.UserId);
         }
         catch (Exception ex)

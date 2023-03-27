@@ -1,4 +1,6 @@
 using Mango.Services.OrderAPI.DbContexts;
+using Mango.Services.OrderAPI.Messaging;
+using Mango.Services.OrderAPI.RabbitMqSender;
 using Mango.Services.OrderAPI.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -17,11 +19,12 @@ optionBuilder.UseSqlServer(builder.Configuration.GetConnectionString("DefaultCon
 
 builder.Services.AddSingleton(new OrderRepository(optionBuilder.Options));
 
-/*
-builder.Services.AddHostedService<RabbitMQPaymentConsumer>();
-builder.Services.AddHostedService<RabbitMQCheckoutConsumer>();
-builder.Services.AddSingleton<IRabbitMQOrderMessageSender, RabbitMQOrderMessageSender>();
-*/
+builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
+
+builder.Services.AddHostedService<RabbitMqPaymentConsumer>();
+builder.Services.AddHostedService<RabbitMqCheckoutConsumer>();
+builder.Services.AddSingleton<IRabbitMqOrderMessageSender, RabbitMqOrderMessageSender>();
+
 builder.Services.AddControllers();
 
 builder.Services.AddAuthentication("Bearer")
@@ -45,36 +48,10 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo {Title = "Mango.Services.CouponAPI", Version = "v1"});
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Description = @"Enter 'Bearer' [space] and your token",
-        Name = "Authorization",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
-    });
-
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                },
-                Scheme = "oauth2",
-                Name = "Bearer",
-                In = ParameterLocation.Header
-            },
-            new List<string>()
-        }
-    });
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Mango.Services.OrderAPI", Version = "v1" });
 });
-var app = builder.Build();
 
+var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
@@ -89,9 +66,6 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllers();
-});
+app.MapControllers();
 
 app.Run();

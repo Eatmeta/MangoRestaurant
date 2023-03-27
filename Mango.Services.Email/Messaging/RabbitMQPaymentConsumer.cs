@@ -1,0 +1,69 @@
+﻿using System.Text;
+using Mango.Services.Email.Messages;
+using Mango.Services.Email.Repository;
+using Newtonsoft.Json;
+using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
+
+namespace Mango.Services.Email.Messaging;
+
+public class RabbitMQPaymentConsumer : BackgroundService
+    {
+        private IConnection _connection;
+        private IModel _channel;
+        private readonly string ExchangeName;
+        private readonly string PaymentEmailUpdateQueueName;
+        private readonly EmailRepository _emailRepo;
+        private readonly IConfiguration _configuration;
+        
+        public RabbitMQPaymentConsumer(EmailRepository emailRepo, IConfiguration configuration)
+        {
+            _emailRepo = emailRepo;
+            _configuration = configuration;
+            PaymentEmailUpdateQueueName = _configuration["RabbitMqSettings:PaymentEmailUpdateQueueName"];
+            ExchangeName = _configuration["RabbitMqSettings:ExchangeName"];
+            
+            var factory = new ConnectionFactory
+            {
+                HostName = "rabbitmq",
+                UserName = "guest",
+                Password = "guest"
+            };
+
+            _connection = factory.CreateConnection();
+            _channel = _connection.CreateModel();
+            
+            _channel.ExchangeDeclare(ExchangeName, ExchangeType.Direct);
+            _channel.QueueDeclare(PaymentEmailUpdateQueueName, false, false, false, null);
+            _channel.QueueBind(PaymentEmailUpdateQueueName, ExchangeName, "PaymentEmail");
+        }
+        protected override Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            stoppingToken.ThrowIfCancellationRequested();
+
+            var consumer = new EventingBasicConsumer(_channel);
+            consumer.Received += (ch, ea) =>
+            {
+                var content = Encoding.UTF8.GetString(ea.Body.ToArray());
+                var updatePaymentResultMessage = JsonConvert.DeserializeObject<UpdatePaymentResultMessage>(content);
+                HandleMessage(updatePaymentResultMessage).GetAwaiter().GetResult();
+
+                _channel.BasicAck(ea.DeliveryTag, false);
+            };
+            _channel.BasicConsume(PaymentEmailUpdateQueueName, false, consumer);
+
+            return Task.CompletedTask;
+        }
+
+        private async Task HandleMessage(UpdatePaymentResultMessage updatePaymentResultMessage)
+        {
+            try
+            {
+                await _emailRepo.SendAndLogEmail(updatePaymentResultMessage);
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
+        }
+    }
