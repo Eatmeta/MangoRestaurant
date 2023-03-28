@@ -15,7 +15,7 @@ public class CartAPIController : Controller
     private readonly ICouponRepository _couponRepository;
     private readonly IRabbitMqCartMessageSender _rabbitMQCartMessageSender;
     private readonly IConfiguration _configuration;
-
+    private readonly string _checkoutQueueName;
     public CartAPIController(ICartRepository cartRepository, ICouponRepository couponRepository,
         IRabbitMqCartMessageSender rabbitMQCartMessageSender, IConfiguration Configuration)
     {
@@ -24,6 +24,7 @@ public class CartAPIController : Controller
         _couponRepository = couponRepository;
         _rabbitMQCartMessageSender = rabbitMQCartMessageSender;
         _configuration = Configuration;
+        _checkoutQueueName = _configuration["RabbitMqSettings:CheckoutQueueName"];
     }
 
     [HttpGet("GetCart/{userId}")]
@@ -161,7 +162,7 @@ public class CartAPIController : Controller
 
             checkoutHeader.CartDetails = cartDto.CartDetails;
 
-            _rabbitMQCartMessageSender.SendMessage(checkoutHeader, _configuration["RabbitMqSettings:QueueName"]);
+            _rabbitMQCartMessageSender.SendMessage(checkoutHeader, _checkoutQueueName);
             await _cartRepository.ClearCart(checkoutHeader.UserId);
         }
         catch (Exception ex)

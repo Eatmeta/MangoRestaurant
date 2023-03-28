@@ -16,6 +16,8 @@ public class RabbitMqCheckoutConsumer : BackgroundService
     private IModel _channel;
     private readonly IRabbitMqOrderMessageSender _rabbitMqOrderMessageSender;
     private readonly IConfiguration _configuration;
+    private readonly string _checkoutQueueName;
+    private readonly string _paymentQueueName;
 
     public RabbitMqCheckoutConsumer(OrderRepository orderRepository,
         IRabbitMqOrderMessageSender rabbitMqOrderMessageSender, IConfiguration configuration)
@@ -23,6 +25,8 @@ public class RabbitMqCheckoutConsumer : BackgroundService
         _orderRepository = orderRepository;
         _rabbitMqOrderMessageSender = rabbitMqOrderMessageSender;
         _configuration = configuration;
+        _checkoutQueueName = _configuration["RabbitMqSettings:CheckoutQueueName"];
+        _paymentQueueName = _configuration["RabbitMqSettings:PaymentQueueName"];
 
         var factory = new ConnectionFactory
         {
@@ -33,7 +37,7 @@ public class RabbitMqCheckoutConsumer : BackgroundService
 
         _connection = factory.CreateConnection();
         _channel = _connection.CreateModel();
-        _channel.QueueDeclare(_configuration["RabbitMqSettings:QueueName"], false, false, false, null);
+        _channel.QueueDeclare(_checkoutQueueName, false, false, false, null);
     }
 
     protected override Task ExecuteAsync(CancellationToken cancellationToken)
@@ -50,7 +54,7 @@ public class RabbitMqCheckoutConsumer : BackgroundService
 
             _channel.BasicAck(eventArgs.DeliveryTag, false);
         };
-        _channel.BasicConsume(_configuration["RabbitMqSettings:QueueName"], false, consumer);
+        _channel.BasicConsume(_checkoutQueueName, false, consumer);
 
         return Task.CompletedTask;
     }
@@ -104,8 +108,7 @@ public class RabbitMqCheckoutConsumer : BackgroundService
 
         try
         {
-            _rabbitMqOrderMessageSender.SendMessage(paymentRequestMessage,
-                _configuration["RabbitMqSettings:PaymentQueueName"]);
+            _rabbitMqOrderMessageSender.SendMessage(paymentRequestMessage, _paymentQueueName);
         }
         catch (Exception e)
         {

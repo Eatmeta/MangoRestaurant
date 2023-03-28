@@ -15,6 +15,7 @@ public class RabbitMqPaymentConsumer : BackgroundService
         private readonly IRabbitMqPaymentMessageSender _rabbitMqPaymentMessageSender;
         private readonly IProcessPayment _processPayment;
         private readonly IConfiguration _configuration;
+        private readonly string _paymentQueueName;
 
         public RabbitMqPaymentConsumer(IRabbitMqPaymentMessageSender rabbitMqPaymentMessageSender,
             IProcessPayment processPayment, IConfiguration configuration)
@@ -22,6 +23,7 @@ public class RabbitMqPaymentConsumer : BackgroundService
             _processPayment = processPayment;
             _rabbitMqPaymentMessageSender = rabbitMqPaymentMessageSender;
             _configuration = configuration;
+            _paymentQueueName = _configuration["RabbitMqSettings:PaymentQueueName"];
             
             var factory = new ConnectionFactory
             {
@@ -32,23 +34,22 @@ public class RabbitMqPaymentConsumer : BackgroundService
 
             _connection = factory.CreateConnection();
             _channel = _connection.CreateModel();
-            _channel.QueueDeclare(_configuration["RabbitMqSettings:PaymentQueueName"], 
-                false, false, false, arguments: null);
+            _channel.QueueDeclare(_paymentQueueName, false, false, false, arguments: null);
         }
         protected override Task ExecuteAsync(CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             var consumer = new EventingBasicConsumer(_channel);
-            consumer.Received += (ch, ea) =>
+            consumer.Received += (channel, eventArgs) =>
             {
-                var content = Encoding.UTF8.GetString(ea.Body.ToArray());
+                var content = Encoding.UTF8.GetString(eventArgs.Body.ToArray());
                 var paymentRequestMessage = JsonConvert.DeserializeObject<PaymentRequestMessage>(content);
                 HandleMessage(paymentRequestMessage).GetAwaiter().GetResult();
 
-                _channel.BasicAck(ea.DeliveryTag, false);
+                _channel.BasicAck(eventArgs.DeliveryTag, false);
             };
-            _channel.BasicConsume(_configuration["RabbitMqSettings:PaymentQueueName"], false, consumer);
+            _channel.BasicConsume(_paymentQueueName, false, consumer);
 
             return Task.CompletedTask;
         }

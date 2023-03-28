@@ -11,7 +11,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddScoped<IEmailRepository, EmailRepository>();
 
-builder.Services.AddHostedService<RabbitMQPaymentConsumer>();
+builder.Services.AddHostedService<RabbitMqPaymentConsumer>();
 
 var optionBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
 optionBuilder.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));

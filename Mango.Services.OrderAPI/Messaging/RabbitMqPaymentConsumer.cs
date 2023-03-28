@@ -11,10 +11,10 @@ public class RabbitMqPaymentConsumer : BackgroundService
 {
     private IConnection _connection;
     private IModel _channel;
-    private readonly string _exchangeName;
-    private readonly string _paymentOrderUpdateQueueName;
     private readonly IConfiguration _configuration;
     private readonly OrderRepository _orderRepository;
+    private readonly string _exchangeName;
+    private readonly string _paymentOrderUpdateQueueName;
     
     public RabbitMqPaymentConsumer(OrderRepository orderRepository, IConfiguration configuration)
     {
@@ -42,13 +42,13 @@ public class RabbitMqPaymentConsumer : BackgroundService
         cancellationToken.ThrowIfCancellationRequested();
 
         var consumer = new EventingBasicConsumer(_channel);
-        consumer.Received += (ch, ea) =>
+        consumer.Received += (channel, eventArgs) =>
         {
-            var content = Encoding.UTF8.GetString(ea.Body.ToArray());
+            var content = Encoding.UTF8.GetString(eventArgs.Body.ToArray());
             var updatePaymentResultMessage = JsonConvert.DeserializeObject<UpdatePaymentResultMessage>(content);
             HandleMessage(updatePaymentResultMessage).GetAwaiter().GetResult();
 
-            _channel.BasicAck(ea.DeliveryTag, false);
+            _channel.BasicAck(eventArgs.DeliveryTag, false);
         };
         _channel.BasicConsume(_paymentOrderUpdateQueueName, false, consumer);
 
